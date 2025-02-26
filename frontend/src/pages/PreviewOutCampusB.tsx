@@ -370,11 +370,11 @@ const PreviewOutCampusB: React.FC = () => {
           </table>
 
           <h3>Form B - Proposed Budget</h3>
-          <p><span style={{ fontWeight: 500 }}>Proposed Activity Fee/Contribution per student: </span> Php {proposal?.actfee_proposed}</p>
+          <p><span style={{ fontWeight: 500 }}>Proposed Activity Fee/Contribution per student: </span> Php {proposal?.actfee_proposed ?? 0}</p>
           <p><span style={{ fontWeight: 500 }}>Proposed Budget: </span></p>
-          <p><span style={{ fontWeight: 500 }}>   Total Collection: </span> Php {proposal?.actfee_collection}</p>
-          <p><span style={{ fontWeight: 500 }}>   Less Expenses: </span> Php {proposal?.actfee_expense}</p>
-          <p><span style={{ fontWeight: 500 }}>   Remaining Balance: </span> Php {proposal?.actfee_collection - proposal?.actfee_expense}</p>
+          <p><span style={{ fontWeight: 500 }}>   Total Collection: </span> Php {proposal?.actfee_collection ?? 0}</p>
+          <p><span style={{ fontWeight: 500 }}>   Less Expenses: </span> Php {proposal?.actfee_expense ?? 0}</p>
+          <p><span style={{ fontWeight: 500 }}>   Remaining Balance: </span> Php {(proposal?.actfee_collection ?? 0) - (proposal?.actfee_expense ?? 0)}</p>
 
           <h3>Breakdown of Proposed Budget</h3>
           <table className="details-table">

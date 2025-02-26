@@ -1,10 +1,9 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import './Accreditation.css';
 import axios from 'axios';
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import logo from '/unc_logo.png';
-
-
+import Papa from 'papaparse';
 
 interface User {
   user_id: string;
@@ -12,19 +11,19 @@ interface User {
 }
 
 interface Organization {
-    org_id: string;
-    org_name: string;
-    org_type: string;
-    org_tag: string;
-    org_desc: string;
-    adv_id: string;
-    dean_id: string;
-    sy_id: string;
-    org_img: string;
-    org_header: string;
-    user_id: string;
-    user_role: string;
-  }
+  org_id: string;
+  org_name: string;
+  org_type: string;
+  org_tag: string;
+  org_desc: string;
+  adv_id: string;
+  dean_id: string;
+  sy_id: string;
+  org_img: string;
+  org_header: string;
+  user_id: string;
+  user_role: string;
+}
 
 interface Member {
   member_id: string;
@@ -60,25 +59,20 @@ const ReaccreditationForm: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { stud_id } = useParams<{ stud_id: string }>();
-
   const { userId } = location.state || {};
- //const { org_id } = useParams<{ org_id: string }>();
-  const [organization, setOrganization] = useState<Organization | null>(null);
-   const { org_id } = useParams<{ org_id: string }>();
-  const [orgId, setOrgId] = useState<Organization | null>(null);
-   const [organizations, setOrganizations] = useState<Organization[]>([]);
-   
-   const [userInfoState, setUserInfoState] = useState<Organization | null>(null);
+  const { org_id } = useParams<{ org_id: string }>();
 
+  const [organization, setOrganization] = useState<Organization | null>(null);
+  const [organizations, setOrganizations] = useState<Organization[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [users, setUsers] = useState<User[]>([]);
-  
   const [userInfo, setUserInfo] = useState<User | null>(null);
-
   const [members, setMembers] = useState<Member[]>([]);
   const [officers, setOfficers] = useState<Member[]>([]);
   const [activities, setActivities] = useState<Activity[]>([]);
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const addMember = () => {
     setMembers([...members, { member_id: '', stud_id: '', acc_id: '', member_email: '', member_name: '', member_position: '', member_contact: '' }]);
@@ -120,6 +114,29 @@ const ReaccreditationForm: React.FC = () => {
     setActivities(activities.filter((_, i) => i !== index));
   };
 
+  const handleCSVUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      Papa.parse(file, {
+        header: true,
+        dynamicTyping: true,
+        complete: (results) => {
+          const parsedMembers = results.data as Member[];
+          setMembers([...members, ...parsedMembers]);
+        },
+        error: (err) => {
+          console.error('Error parsing CSV:', err);
+        }
+      });
+    }
+  };
+
+  const handleUploadButtonClick = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
+    }
+  };
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -131,12 +148,8 @@ const ReaccreditationForm: React.FC = () => {
         setUsers(usersResponse.data);
         setOrganizations(organizationsResponse.data);
         const org = organizationsResponse.data.find((o: Organization) => o.org_id === org_id);
-       setOrgId(org || null);
-        setOrgId(org ? org.org_id : ''); // Set adviser name
         setOrganization(org || null);
-        setOrganizations(organizationsResponse.data);
 
-      
         console.log('Fetched users:', usersResponse.data);
         console.log('Fetched organizations:', organizationsResponse.data);
       } catch (error) {
@@ -148,7 +161,7 @@ const ReaccreditationForm: React.FC = () => {
     };
 
     fetchData();
-  }, []);
+  }, [org_id]);
 
   useEffect(() => {
     if (userId && users.length > 0 && organizations.length > 0) {
@@ -168,9 +181,6 @@ const ReaccreditationForm: React.FC = () => {
       }
     }
   }, [userId, users, organizations]);
-
-
-   
 
   const handleSignOut = () => {
     navigate('/', { state: { userId: null } });
@@ -299,7 +309,11 @@ const ReaccreditationForm: React.FC = () => {
                   ))}
                 </tbody>
               </table>
-              <button type="button" onClick={addMember} className="accre-form-content-add-member">Add Member</button>
+              <div className="members-row-buttons">
+                <button type="button" onClick={addMember} className="accre-form-content-add-member">Add Member</button>
+                <input type="file" accept=".csv" ref={fileInputRef} onChange={handleCSVUpload} style={{ display: 'none' }} />
+                <button type="button" onClick={handleUploadButtonClick} className="accre-form-content-add-member">Upload CSV</button>
+              </div>
             </div>
 
             <div className="accre-form-content-section">

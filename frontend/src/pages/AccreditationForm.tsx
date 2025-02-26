@@ -1,8 +1,9 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import './Accreditation.css';
 import axios from 'axios';
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import logo from '/unc_logo.png';
+import Papa from 'papaparse';
 
 interface Student {
   stud_id: string;
@@ -65,6 +66,8 @@ const AccreditationForm: React.FC = () => {
   const [officers, setOfficers] = useState<Member[]>([]);
   const [activities, setActivities] = useState<Activity[]>([]);
 
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
   const addMember = () => {
     setMembers([...members, { member_id: '', stud_id: '', acc_id: '', member_email: '', member_name: '', member_position: '', member_contact: '' }]);
   };
@@ -103,6 +106,29 @@ const AccreditationForm: React.FC = () => {
 
   const removeActivity = (index: number) => {
     setActivities(activities.filter((_, i) => i !== index));
+  };
+
+  const handleCSVUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      Papa.parse(file, {
+        header: true,
+        dynamicTyping: true,
+        complete: (results) => {
+          const parsedMembers = results.data as Member[];
+          setMembers([...members, ...parsedMembers]);
+        },
+        error: (err) => {
+          console.error('Error parsing CSV:', err);
+        }
+      });
+    }
+  };
+
+  const handleUploadButtonClick = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
+    }
   };
 
   useEffect(() => {
@@ -277,7 +303,11 @@ const AccreditationForm: React.FC = () => {
                   ))}
                 </tbody>
               </table>
-              <button type="button" onClick={addMember} className="accre-form-content-add-member">Add Member</button>
+              <div className="members-row-buttons">
+                <button type="button" onClick={addMember} className="accre-form-content-add-member">Add Member</button>
+                <input type="file" accept=".csv" ref={fileInputRef} onChange={handleCSVUpload} style={{ display: 'none' }} />
+                <button type="button" onClick={handleUploadButtonClick} className="accre-form-content-add-member">Upload CSV</button>
+              </div>
             </div>
 
             <div className="accre-form-content-section">

@@ -167,3 +167,9 @@
   border: none;
   outline: none;
 }
+
+.members-row-buttons {
+  display:flex;
+  flex-direction: row;
+  gap: 10px;
+}

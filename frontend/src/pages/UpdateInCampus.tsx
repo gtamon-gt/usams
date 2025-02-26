@@ -1019,60 +1019,63 @@ const UpdateInCampus: React.FC = () => {
                 </div>
                 )}
             {activeSection === 'FormC' && (
-  <div className="section form-c-section">
-    <h2 className="form-c-title">Form C - List of Student Participants</h2>
-    <hr className="title-custom-line" />
+              <div className="section form-c-section">
+                <h2 className="form-c-title">Form C - List of Student Participants</h2>
+                <hr className="title-custom-line" />
 
-    <div className="form-and-table-container form-c-container">
-      {proposal.note ? (
-        <label className="note-allmembers">
-          <span>Note:</span>
-          <input
-            type="text"
-            value={allMembersNote}
-            onChange={(e) => setAllMembersNote(e.target.value)}
-          />
-        </label>
-      ) : (
-        <>
-          <div className="students-table-container">
-            <h3>Added Participants:</h3>
-            <table>
-              <thead>
-                <tr>
-                  <th><span>Student ID</span></th>
-                  <th><span>Department</span></th>
-                  <th><span>Student Name</span></th>
-                  <th><span>Actions</span></th>
-                </tr>
-              </thead>
-              <tbody>
-                {participants.map((participant) => {
-                  const student = students.find(stud => stud.stud_id === participant.stud_id);
-                  return (
-                    <tr key={participant.part_id}>
-                      <td>{student ? student.stud_id : 'N/A'}</td>
-                      <td>{student ? student.stud_dept : 'N/A'}</td>
-                      <td>{student ? student.stud_name : 'N/A'}</td>
-                      <td>
-                        <div className="edit-buttons">
-                          <button className="delete-button" onClick={() => handleDeleteStudent(student.stud_id)}>
-                            <img src="/delete-red.svg" alt="Delete" />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
-        </>
-      )}
-    </div>
-  </div>
-)}
-
+                <div className="form-and-table-container form-c-container">
+                  {proposal.note ? (
+                    <label className="note-allmembers">
+                      <span>Note:</span>
+                      <input
+                        type="text"
+                        value={allMembersNote}
+                        onChange={(e) => setAllMembersNote(e.target.value)}
+                      />
+                    </label>
+                  ) : (
+                    <>
+                      <div className="students-table-container">
+                        <h3>Added Participants:</h3>
+                        <table>
+                          <thead>
+                            <tr>
+                              <th><span>Student ID</span></th>
+                              <th><span>Department</span></th>
+                              <th><span>Student Name</span></th>
+                              <th><span>Actions</span></th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {participants.map((participant) => {
+                              const student = students.find(stud => stud.stud_id === participant.stud_id);
+                              return (
+                                <tr key={participant.part_id}>
+                                  <td>{student ? student.stud_id : 'N/A'}</td>
+                                  <td>{student ? student.stud_dept : 'N/A'}</td>
+                                  <td>{student ? student.stud_name : 'N/A'}</td>
+                                  <td>
+                                    <div className="edit-buttons">
+                                      <button
+                                        className="delete-button"
+                                        onClick={() => student && handleDeleteStudent(student.stud_id)}
+                                        disabled={!student}
+                                      >
+                                        <img src="/delete-red.svg" alt="Delete" />
+                                      </button>
+                                    </div>
+                                  </td>
+                                </tr>
+                              );
+                            })}
+                          </tbody>
+                        </table>
+                      </div>
+                    </>
+                  )}
+                </div>
+              </div>
+            )}
             {activeSection === 'FormD' && (
               <div className="section">
                 <h2 className="form-d-title">Form D - UN SDG Alignment</h2>
